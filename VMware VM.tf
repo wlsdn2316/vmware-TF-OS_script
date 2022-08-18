@@ -1,3 +1,21 @@
+#[출처] Terraform + VM Template = 대량 배포|작성자 Patton
+# Variables
+variable "vsphere_domain"			{default = "dm-mgt-vcenter-1.dmvpc.local"}
+variable "vsphere_user"				{default = "jwjin"}
+variable "vsphere_user_paasword"	{default = "Dream@1029!#"}
+
+variable "data_center"				{default = "dmvpc-datacenter"}
+variable "cluster"					{default = "compute-cluster"}
+variable "workload_host"            {default = "dm-comp-esxi-5.dmvpc.local"}
+variable "workload_datastore"		{default = "ZBS"}
+variable "vm_network"				{default = "cu-bookcubenetworks-seg"}	
+variable "vm_template"				{default = "TP-centos7.9"}	
+variable "ip_address"               {default = "10.105.0.5"}	
+
+variable "VM_name_prefix" 		    {default = "TESTterraform-"}
+variable "VM_name_suffix"			{default = "-Copy"}
+variable "nVMs"						{default = 3}
+variable "nStarting" 				{default = 0}
 
 
 #################################################################################################################
@@ -17,15 +35,21 @@ provider "vsphere" {
    name = "dmvpc-datacenter"
  }
 
-# data "vsphere_resource_pool" "pool" {
-#   name          = "compute-cluster/dm-comp-esxi-5.dmvpc.local"
-#   datacenter_id = data.vsphere_datacenter.mark1dc.id
-# }
+# If you don't have any resource pools, put "Resources" after cluster name
+ data "vsphere_resource_pool" "pool" {
+   name          = "compute-cluster/Resources"
+   datacenter_id = data.vsphere_datacenter.mark1dc.id
+ }
 
  data "vsphere_compute_cluster" "cluster" {
    name          = "compute-cluster"
    datacenter_id = data.vsphere_datacenter.mark1dc.id
  }
+
+data "vsphere_host" "host" {
+  name          = var.workload_host                                         #"dm-comp-esxi-5.dmvpc.local"
+  datacenter_id = data.vsphere_datacenter.mark1dc.id
+}
 
  data "vsphere_datastore" "datastore" {
    name          = "ZBS"
@@ -33,13 +57,12 @@ provider "vsphere" {
  }
 
  data "vsphere_network" "network" {
-   name          = "cu-bookcubenetworks-seg"
+   name          = var.vm_network                                           #"cu-bookcubenetworks-seg"
    datacenter_id = data.vsphere_datacenter.mark1dc.id
  }
 
-# Retrieve template information on vsphere
 data "vsphere_virtual_machine" "template" {
-  name          = "TP-centos7.9"
+  name          = var.vm_template                                           #"TP-centos7.9"
   datacenter_id = data.vsphere_datacenter.mark1dc.id
 } 
 
@@ -48,22 +71,44 @@ data "vsphere_virtual_machine" "template" {
 #################################################################################################################
 
 resource "vsphere_virtual_machine" "DemoVM" {
-  name             = "TEST-DemoVM"
-  resource_pool_id = data.vsphere_compute_cluster.cluster.id
+
+  count            = var.nVMs  
+
+  name             = "${var.VM_name_prefix}${format("%02d", count.index + var.nStarting)}${var.VM_name_suffix}"
   datastore_id     = data.vsphere_datastore.datastore.id
+  host_system_id   = data.vsphere_host.host.id
+  
+  
   num_cpus         = 2
   memory           = 4096
-  guest_id         = "data.vsphere_virtual_machine.template"
+  resource_pool_id = data.vsphere_resource_pool.pool.id
+  guest_id         = data.vsphere_virtual_machine.template.guest_id
+  scsi_type        = data.vsphere_virtual_machine.template.scsi_type
 
   network_interface {
     network_id = data.vsphere_network.network.id
   }
 
   disk {
-    label = "disk0"
-    size  = 30
+    label = "disk0"  # 디스크는 블록label 의 속성에 제공된 레이블로 관리됩니다 . 이는 가상 머신이 생성될 때 vSphere가 할당하는 자동 이름 지정과는 별개입니다.
+    size  = 50
+  }
+
+  clone {
+    template_uuid = data.vsphere_virtual_machine.template.id
+
+    customize {
+      linux_options {
+        host_name = "${var.VM_name_prefix}${format("%02d", count.index + var.nStarting)}${var.VM_name_suffix}"
+        domain    = "test.internal"
+      }
+
+      network_interface {
+        ipv4_address    = "10.105.0.6"
+        ipv4_netmask    = 29
+        dns_server_list = ["8.8.8.8", "8.8.4.4"]
+      }
+      ipv4_gateway = "10.105.0.1"
+    }
   }
 }
-
-#변경사항 테스트
-#변경사항 테스트 2
