@@ -1,21 +1,21 @@
 #[출처] Terraform + VM Template = 대량 배포|작성자 Patton
 # Variables
-variable "vsphere_domain"			{default = "dm-mgt-vcenter-1.dmvpc.local"}
-variable "vsphere_user"				{default = "jwjin"}
+variable "vsphere_domain"			    {default = "dm-mgt-vcenter-1.dmvpc.local"}
+variable "vsphere_user"				    {default = "jwjin"}
 variable "vsphere_user_paasword"	{default = "Dream@1029!#"}
 
-variable "data_center"				{default = "dmvpc-datacenter"}
-variable "cluster"					{default = "compute-cluster"}
-variable "workload_host"            {default = "dm-comp-esxi-5.dmvpc.local"}
-variable "workload_datastore"		{default = "ZBS"}
-variable "vm_network"				{default = "cu-bookcubenetworks-seg"}	
-variable "vm_template"				{default = "TP-centos7.9"}	
-variable "ip_address"               {default = "10.105.0.5"}	
+variable "data_center"				    {default = "dmvpc-datacenter"}
+variable "cluster"					      {default = "compute-cluster"}
+variable "workload_host"          {default = "dm-comp-esxi-5.dmvpc.local"}
+variable "workload_datastore"		  {default = "ZBS"}
+variable "vm_network"			      	{default = "cu-bookcubenetworks-seg"}	
+variable "vm_template"			    	{default = "TP-centos7.9"}	
+variable "ip_address"             {default = "10.105.0.5"}	
 
 variable "VM_name_prefix" 		    {default = "TESTterraform-"}
-variable "VM_name_suffix"			{default = "-Copy"}
-variable "nVMs"						{default = 3}
-variable "nStarting" 				{default = 0}
+variable "VM_name_suffix"			    {default = "-Copy"}
+variable "nVMs"						        {default = 3}
+variable "nStarting" 				      {default = 0}
 
 
 #################################################################################################################
@@ -111,4 +111,5 @@ resource "vsphere_virtual_machine" "DemoVM" {
       ipv4_gateway = "10.105.0.1"
     }
   }
+
 }
