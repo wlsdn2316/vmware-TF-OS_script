@@ -66,3 +66,4 @@ resource "vsphere_virtual_machine" "DemoVM" {
 }
 
 #변경사항 테스트
+#변경사항 테스트 2
