@@ -1,34 +1,36 @@
 #[출처] Terraform + VM Template = 대량 배포|작성자 Patton
+#ctrl k + c  모두 주석
+#ctrl k + u  모두 주석해제
+
 # Variables
-variable "vsphere_domain"			    {default = "dm-mgt-vcenter-1.dmvpc.local"}
-variable "vsphere_user"				    {default = "jwjin"}
-variable "vsphere_user_paasword"	{default = "Dream@1029!#"}
+variable "vsphere_domain"			    {default = ""}
+variable "vsphere_user"				    {default = ""}
+variable "vsphere_user_paasword"	{default = ""}
 
-variable "data_center"				    {default = "dmvpc-datacenter"}
+variable "data_center"		    		{default = "dmvpc-datacenter"}
 variable "cluster"					      {default = "compute-cluster"}
+variable "workload_datastore"   	{default = "ZBS"}
+
 variable "workload_host"          {default = "dm-comp-esxi-5.dmvpc.local"}
-variable "workload_datastore"		  {default = "ZBS"}
-variable "vm_network"			      	{default = "cu-bookcubenetworks-seg"}	
+variable "vm_network"				      {default = "cu-bookcubenetworks-seg"}	
 variable "vm_template"			    	{default = "TP-centos7.9"}	
-variable "ip_address"             {default = "10.105.0.5"}	
-
-variable "VM_name_prefix" 		    {default = "TESTterraform-"}
-variable "VM_name_suffix"			    {default = "-Copy"}
-variable "nVMs"						        {default = 3}
-variable "nStarting" 				      {default = 0}
-
+variable "ip_address"             {default = ""}	
+variable "IPnStarting" 			    	{default = 5}                                    #count + IPnStarting값
+variable "VM_name_prefix" 	    	{default = "TEST-terraform-"}
+variable "VM_name_suffix"		    	{default = "-Copy"}
+variable "nVMs"						        {default = 3}                                    #VM 생성 개수
+variable "nStarting" 				      {default = 0}                                    #초기 시작 숫자 변경을 위한 값
+variable "ipv4_gateway"           {default = ""}  
 
 #################################################################################################################
 ####                                Terraform Provider for VMware vSphere                                    ####
 #################################################################################################################
-#ctrl k + c  모두 주석
-#ctrl k + u  모두 주석해제
 
 provider "vsphere" {
-  user                 = "jwjin"
-  password             = "Dream@1029!#"
-  vsphere_server       = "dm-mgt-vcenter-1.dmvpc.local"
-  allow_unverified_ssl = true
+  user                 = ""
+  password             = ""
+  vsphere_server       = ""
+  allow_unverified_ssl = true                                            
 }
 
  data "vsphere_datacenter" "mark1dc" {
@@ -78,12 +80,12 @@ resource "vsphere_virtual_machine" "DemoVM" {
   datastore_id     = data.vsphere_datastore.datastore.id
   host_system_id   = data.vsphere_host.host.id
   
-  
   num_cpus         = 2
   memory           = 4096
   resource_pool_id = data.vsphere_resource_pool.pool.id
   guest_id         = data.vsphere_virtual_machine.template.guest_id
   scsi_type        = data.vsphere_virtual_machine.template.scsi_type
+  firmware         = data.vsphere_virtual_machine.template.firmware
 
   network_interface {
     network_id = data.vsphere_network.network.id
@@ -104,11 +106,11 @@ resource "vsphere_virtual_machine" "DemoVM" {
       }
 
       network_interface {
-        ipv4_address    = "10.105.0.6"
+        ipv4_address    = "${var.ip_address}${count.index + var.IPnStarting}"
         ipv4_netmask    = 29
         dns_server_list = ["8.8.8.8", "8.8.4.4"]
       }
-      ipv4_gateway = "10.105.0.1"
+      ipv4_gateway = var.ipv4_gateway
     }
   }
 
