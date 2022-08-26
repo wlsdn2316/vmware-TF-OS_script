@@ -3,23 +3,23 @@
 #ctrl k + u  모두 주석해제
 
 # Variables
-variable "vsphere_domain"			    {default = ""}
-variable "vsphere_user"				    {default = ""}
-variable "vsphere_user_paasword"	{default = ""}
+variable "vsphere_domain"         {default = ""}
+variable "vsphere_user"           {default = ""}
+variable "vsphere_user_paasword"  {default = ""}
 
-variable "data_center"		    		{default = "dmvpc-datacenter"}
-variable "cluster"					      {default = "compute-cluster"}
-variable "workload_datastore"   	{default = "ZBS"}
+variable "data_center"            {default = "dmvpc-datacenter"}
+variable "cluster"                {default = "compute-cluster"}
+variable "workload_datastore"     {default = "ZBS"}
 
 variable "workload_host"          {default = "dm-comp-esxi-5.dmvpc.local"}
-variable "vm_network"				      {default = "cu-bookcubenetworks-seg"}	
-variable "vm_template"			    	{default = "TP-centos7.9"}	
+variable "vm_network"             {default = "cu-bookcubenetworks-seg"}	
+variable "vm_template"            {default = "TP-centos7.9"}	
 variable "ip_address"             {default = ""}	
-variable "IPnStarting" 			    	{default = 5}                                    #count + IPnStarting값
-variable "VM_name_prefix" 	    	{default = "TEST-terraform-"}
-variable "VM_name_suffix"		    	{default = "-Copy"}
-variable "nVMs"						        {default = 3}                                    #VM 생성 개수
-variable "nStarting" 				      {default = 0}                                    #초기 시작 숫자 변경을 위한 값
+variable "IPnStarting"            {default = 5}                                    #count + IPnStarting값
+variable "VM_name_prefix"         {default = "TEST-terraform-"}
+variable "VM_name_suffix"         {default = "-Copy"}
+variable "nVMs"                   {default = 3}                                    #VM 생성 개수
+variable "nStarting"              {default = 0}                                    #초기 시작 숫자 변경을 위한 값
 variable "ipv4_gateway"           {default = ""}  
 
 #################################################################################################################
