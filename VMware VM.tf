@@ -3,33 +3,33 @@
 #ctrl k + u  모두 주석해제
 
 # Variables
-variable "vsphere_domain"         {default = ""}
-variable "vsphere_user"           {default = ""}
-variable "vsphere_user_paasword"  {default = ""}
+variable "vsphere_domain"               {default = "dm-mgt-vcenter-1.dmvpc.local"}
+variable "vsphere_user"                 {default = "jwjin"}
+variable "vsphere_user_paasword"        {default = "Dream@1029!#"}
 
-variable "data_center"            {default = "dmvpc-datacenter"}
-variable "cluster"                {default = "compute-cluster"}
-variable "workload_datastore"     {default = "ZBS"}
+variable "data_center"                  {default = "dmvpc-datacenter"}
+variable "cluster"                      {default = "compute-cluster"}
+variable "workload_datastore"           {default = "ZBS"}
 
-variable "workload_host"          {default = "dm-comp-esxi-5.dmvpc.local"}
-variable "vm_network"             {default = "cu-bookcubenetworks-seg"}	
-variable "vm_template"            {default = "TP-centos7.9"}	
-variable "ip_address"             {default = ""}	
-variable "IPnStarting"            {default = 5}                                    #count + IPnStarting값
-variable "VM_name_prefix"         {default = "TEST-terraform-"}
-variable "VM_name_suffix"         {default = "-Copy"}
-variable "nVMs"                   {default = 3}                                    #VM 생성 개수
-variable "nStarting"              {default = 0}                                    #초기 시작 숫자 변경을 위한 값
-variable "ipv4_gateway"           {default = ""}  
+variable "workload_host"                {default = "dm-comp-esxi-5.dmvpc.local"}
+variable "vm_network"                   {default = "cu-bookcubenetworks-seg"}	
+variable "vm_template"                  {default = "TP-centos7.9"}	
+variable "ip_address"                   {default = "10.105.0."}	
+variable "IPnStarting"                  {default = 5}                                    #count + IPnStarting값, ip끝자리 결정
+variable "VM_name_prefix"               {default = "TEST-terraform-"}
+variable "VM_name_suffix"               {default = "-Copy"}
+variable "nVMs"                         {default = 3}                                    #VM 생성 개수
+variable "nStarting"                    {default = 0}                                    #초기 시작 숫자 변경을 위한 값
+variable "ipv4_gateway"                 {default = "10.105.0.1"}  
 
 #################################################################################################################
 ####                                Terraform Provider for VMware vSphere                                    ####
 #################################################################################################################
 
 provider "vsphere" {
-  user                 = ""
-  password             = ""
-  vsphere_server       = ""
+  user                 = "jwjin"
+  password             = "Dream@1029!#"
+  vsphere_server       = "dm-mgt-vcenter-1.dmvpc.local"
   allow_unverified_ssl = true                                            
 }
 
@@ -92,7 +92,7 @@ resource "vsphere_virtual_machine" "DemoVM" {
   }
 
   disk {
-    label = "disk0"  # 디스크는 블록label 의 속성에 제공된 레이블로 관리됩니다 . 이는 가상 머신이 생성될 때 vSphere가 할당하는 자동 이름 지정과는 별개입니다.
+    label = "disk${count.index}"  # 디스크는 블록label 의 속성에 제공된 레이블로 관리됩니다 . 이는 가상 머신이 생성될 때 vSphere가 할당하는 자동 이름 지정과는 별개입니다.
     size  = 50
   }
 
